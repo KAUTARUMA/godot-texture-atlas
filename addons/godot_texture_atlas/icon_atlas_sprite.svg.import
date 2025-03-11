@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b707604sk4si5"
-path="res://.godot/imported/spritemap1.png-3edda925f6380ab9c6e5f2274614623c.ctex"
+uid="uid://b67t3kk1hdxoo"
+path="res://.godot/imported/icon_atlas_sprite.svg-621ea8ae23569a6fa1c5e7c8188d1d30.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://stickman optimized/spritemap1.png"
-dest_files=["res://.godot/imported/spritemap1.png-3edda925f6380ab9c6e5f2274614623c.ctex"]
+source_file="res://addons/godot_texture_atlas/icon_atlas_sprite.svg"
+dest_files=["res://.godot/imported/icon_atlas_sprite.svg-621ea8ae23569a6fa1c5e7c8188d1d30.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

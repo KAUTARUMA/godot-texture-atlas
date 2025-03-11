@@ -1,5 +1,6 @@
+@icon("res://addons/godot_texture_atlas/icon_atlas_sprite.svg")
 @tool
-class_name TextureAtlas extends Node2D
+class_name AtlasSprite extends Node2D
 
 const NAMES_BASE = {
 	"ANIMATION": "AN",

@@ -10,10 +10,9 @@ config_version=5
 
 [application]
 
-config/name="Adobe Animate Texture Atlas"
-run/main_scene="uid://c0bie3d0amy2"
+config/name="Godot Texture Atlas"
 config/features=PackedStringArray("4.4", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://b67t3kk1hdxoo"
 
 [display]
 
