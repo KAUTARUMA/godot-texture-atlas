@@ -27,8 +27,14 @@ func _ready() -> void:
 		var sprite = _sprite["SPRITE"] # i dont know why these are in their own dict
 		limbs[sprite["name"]] = Rect2i(int(sprite["x"]), int(sprite["y"]), int(sprite["w"]), int(sprite["h"]))
 	
-	for symbol in animation_json.data["SYMBOL_DICTIONARY"]["Symbols"]:
-		symbols[symbol["SYMBOL_name"]] = symbol["TIMELINE"]["LAYERS"]
+	if animation_json.data.has("SYMBOL_DICTIONARY"):
+		for symbol_data in animation_json.data["SYMBOL_DICTIONARY"]["Symbols"]:
+			symbols[symbol_data["SYMBOL_name"]] = symbol_data["TIMELINE"]["LAYERS"]
+			symbols[symbol_data["SYMBOL_name"]].reverse()
+	
+	# lets just hope no one names their symbol this lol
+	symbols["_timeline"] = animation_json.data["ANIMATION"]["TIMELINE"]["LAYERS"]
+	symbols["_timeline"].reverse()
 
 var count = 0.0
 func _process(delta: float) -> void:
@@ -41,7 +47,7 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	if symbol == "" || !symbols.has(symbol):
-		_draw_timeline(animation_json.data["ANIMATION"]["TIMELINE"]["LAYERS"])
+		_draw_timeline(symbols["_timeline"])
 	else:
 		_draw_timeline(symbols[symbol])
 
@@ -55,7 +61,7 @@ func _draw_timeline(layers:Array, starting_frame:int = 0, transformation:Transfo
 			var type = _element.keys()[0]
 			var element = _element[type]
 			
-			var transform_2d = m3d_to_transform2d(element["Matrix3D"]) * transformation
+			var transform_2d = transformation * m3d_to_transform2d(element["Matrix3D"])
 			
 			match type:
 				"ATLAS_SPRITE_instance":
@@ -64,7 +70,14 @@ func _draw_timeline(layers:Array, starting_frame:int = 0, transformation:Transfo
 					draw_set_transform_matrix(transform_2d)
 					draw_texture_rect_region(spritemap_tex, Rect2i(0, 0, limb.size.x, limb.size.y), limbs[element.name])
 				"SYMBOL_Instance":
-					_draw_timeline(symbols[element["SYMBOL_name"]], element["firstFrame"], transform_2d)
+					if element["symbolType"] == "movieclip":
+						starting_frame = 0
+					else:
+						starting_frame += element["firstFrame"]
+					
+					_draw_timeline(symbols[element["SYMBOL_name"]], starting_frame, transform_2d)
+				_:
+					push_warning("Unsupported type ", type, "!")
 
 func m3d_to_transform2d(matrix: Dictionary) -> Transform2D:
 	var x_axis := Vector2(matrix["m00"], matrix["m01"])
