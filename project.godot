@@ -14,3 +14,7 @@ config/name="Adobe Animate Texture Atlas"
 run/main_scene="uid://c0bie3d0amy2"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+
+[display]
+
+window/vsync/vsync_mode=0

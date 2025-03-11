@@ -1,6 +1,6 @@
 class_name TextureAtlas extends Node2D
 
-const NAMES = {
+const NAMES_BASE = {
 	"ANIMATION": "AN",
 	"SYMBOL_DICTIONARY": "SD",
 	"TIMELINE": "TL",
@@ -26,7 +26,12 @@ const NAMES = {
 }
 
 # empty is defaulted to timeline
-@export var symbol:String = ""
+@export var symbol:String = "":
+	set(value):
+		symbol = value
+		
+		if symbols.is_empty() == false:
+			timeline_length = get_timeline_length(get_layers())
 
 @export var cur_frame:int = 0:
 	set(value):
@@ -44,6 +49,12 @@ const NAMES = {
 			
 			if animation_json.data.has("AN"):
 				is_optimized = true
+			
+			_load_atlas()
+
+var NAMES:Dictionary
+
+var timeline_length:int = 0
 
 var is_optimized:bool = false
 
@@ -53,25 +64,29 @@ var spritemap_json:JSON
 var limbs:Dictionary[String, Rect2i] = {}
 var symbols:Dictionary[String, Array] = {}
 
-func _gkey(key:String):
-	if is_optimized && NAMES.has(key):
-		return NAMES[key]
-	else:
-		return key
-
-func _ready() -> void:
+func _load_atlas() -> void:
+	NAMES = NAMES_BASE.duplicate()
+	limbs.clear()
+	symbols.clear()
+	
+	if !is_optimized:
+		for key in NAMES:
+			NAMES[key] = key
+	
 	for _sprite in spritemap_json.data["ATLAS"]["SPRITES"]:
 		var sprite = _sprite["SPRITE"] # i dont know why these are in their own dict
 		limbs[sprite["name"]] = Rect2i(int(sprite["x"]), int(sprite["y"]), int(sprite["w"]), int(sprite["h"]))
 	
-	if animation_json.data.has(_gkey("SYMBOL_DICTIONARY")):
-		for symbol_data in animation_json.data[_gkey("SYMBOL_DICTIONARY")][_gkey("Symbols")]:
-			symbols[symbol_data[_gkey("SYMBOL_name")]] = symbol_data[_gkey("TIMELINE")][_gkey("LAYERS")]
-			symbols[symbol_data[_gkey("SYMBOL_name")]].reverse()
+	if animation_json.data.has(NAMES["SYMBOL_DICTIONARY"]):
+		for symbol_data in animation_json.data[NAMES["SYMBOL_DICTIONARY"]][NAMES["Symbols"]]:
+			symbols[symbol_data[NAMES["SYMBOL_name"]]] = symbol_data[NAMES["TIMELINE"]][NAMES["LAYERS"]]
+			symbols[symbol_data[NAMES["SYMBOL_name"]]].reverse()
 	
 	# lets just hope no one names their symbol this lol
-	symbols["_timeline"] = animation_json.data[_gkey("ANIMATION")][_gkey("TIMELINE")][_gkey("LAYERS")]
-	symbols["_timeline"].reverse()
+	symbols["_top"] = animation_json.data[NAMES["ANIMATION"]][NAMES["TIMELINE"]][NAMES["LAYERS"]]
+	symbols["_top"].reverse()
+	
+	timeline_length = get_timeline_length(get_layers())
 
 var count = 0.0
 func _process(delta: float) -> void:
@@ -81,38 +96,59 @@ func _process(delta: float) -> void:
 	if count >= 1./24.:
 		count = 0
 		cur_frame += 1
+		
+		if cur_frame > timeline_length:
+			cur_frame = 0
+
+func get_layers() -> Array:
+	if symbol == "" || !symbols.has(symbol):
+		return symbols["_top"]
+	else:
+		return symbols[symbol]
+
+func get_timeline_length(layers:Array) -> int:
+	var longest_length = 0
+	for layer in layers:
+		var total_duration:int = 0
+		
+		for frame in layer[NAMES["Frames"]]:
+			total_duration += frame[NAMES["duration"]]
+		
+		if total_duration > longest_length:
+			longest_length = total_duration
+	
+	return longest_length
 
 func _draw() -> void:
-	if symbol == "" || !symbols.has(symbol):
-		_draw_timeline(symbols["_timeline"])
-	else:
-		_draw_timeline(symbols[symbol])
+	if !symbols.is_empty():
+		_draw_timeline(get_layers(), cur_frame)
 
-func _draw_timeline(layers:Array, starting_frame:int = 0, transformation:Transform2D = Transform2D()):
+func _draw_timeline(layers:Array, starting_frame:int, transformation:Transform2D = Transform2D()) -> void:
 	for layer in layers:
-		var frame = get_index_at_frame(cur_frame, layer[_gkey("Frames")])
+		var frame = get_index_at_frame(starting_frame, layer[NAMES["Frames"]])
 		
 		if frame.is_empty(): continue
 		
-		for _element:Dictionary in frame[_gkey("elements")]:
+		for _element:Dictionary in frame[NAMES["elements"]]:
 			var type = _element.keys()[0]
 			var element = _element[type]
 			
-			var transform_2d = transformation * m3d_to_transform2d(element[_gkey("Matrix3D")])
+			var transform_2d = transformation * m3d_to_transform2d(element[NAMES["Matrix3D"]])
 			
 			match type:
 				"ATLAS_SPRITE_instance", "ASI":
-					var limb = limbs[element[_gkey("name")]]
+					var limb = limbs[element[NAMES["name"]]]
 					
 					draw_set_transform_matrix(transform_2d)
-					draw_texture_rect_region(spritemap_tex, Rect2i(0, 0, limb.size.x, limb.size.y), limbs[element[_gkey("name")]])
+					draw_texture_rect_region(spritemap_tex, Rect2i(0, 0, limb.size.x, limb.size.y), limbs[element[NAMES["name"]]])
 				"SYMBOL_Instance", "SI":
-					if element[_gkey("symbolType")] == _gkey("movieclip"):
-						starting_frame = 0
+					var new_starting_frame = 0
+					if element[NAMES["symbolType"]] == NAMES["movieclip"]:
+						new_starting_frame = cur_frame
 					else:
-						starting_frame += element[_gkey("firstFrame")]
+						new_starting_frame = element[NAMES["firstFrame"]]
 					
-					_draw_timeline(symbols[element[_gkey("SYMBOL_name")]], starting_frame, transform_2d)
+					_draw_timeline(symbols[element[NAMES["SYMBOL_name"]]], new_starting_frame, transform_2d)
 				_:
 					push_warning("Unsupported type ", type, "!")
 
@@ -126,24 +162,17 @@ func m3d_to_transform2d(matrix) -> Transform2D:
 		y_axis = Vector2(matrix[4], matrix[5])
 		translation = Vector2(matrix[12], matrix[13])
 	else:
-		x_axis = Vector2(matrix[_gkey("m00")], matrix[_gkey("m01")])
-		y_axis = Vector2(matrix[_gkey("m10")], matrix[_gkey("m11")])
-		translation = Vector2(matrix[_gkey("m30")], matrix[_gkey("m31")])
+		x_axis = Vector2(matrix["m00"], matrix["m01"])
+		y_axis = Vector2(matrix["m10"], matrix["m11"])
+		translation = Vector2(matrix["m30"], matrix["m31"])
 
 	return Transform2D(x_axis, y_axis, translation)
 
-func get_index_at_frame(target_frame: int, frames: Array) -> Dictionary:
-	var total_duration:int = 0
-	
-	for frame in frames:
-		total_duration += frame[_gkey("duration")]
-	
-	target_frame = target_frame % total_duration
-	
+func get_index_at_frame(target_frame:int, frames:Array) -> Dictionary:
 	var accumulated_frames = 0
 	for frame in frames:
-		accumulated_frames += frame[_gkey("duration")]
-		if target_frame < accumulated_frames:
+		accumulated_frames += frame[NAMES["duration"]]
+		if target_frame <= accumulated_frames:
 			return frame
 	
 	return {}
