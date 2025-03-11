@@ -15,9 +15,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 69.4,
 											"y": 138.85
@@ -69,9 +67,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 69.4,
 											"y": 138.95000000000003
@@ -123,9 +119,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 69.4,
 											"y": 139.05
@@ -177,9 +171,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 69.4,
 											"y": 139.05
@@ -231,12 +223,10 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 69.4,
-											"y": 139.15
+											"y": 139.20000000000003
 										},
 										"Matrix3D": {
 											"m00": 0.7067718505859375,
@@ -285,11 +275,9 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
-											"x": 69.5,
+											"x": 69.55,
 											"y": 139.25
 										},
 										"Matrix3D": {
@@ -339,9 +327,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 69.60000000000001,
 											"y": 139.20000000000003
@@ -393,9 +379,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.3,
 											"y": 93.30000000000001
@@ -447,9 +431,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.45,
 											"y": 93.35000000000001
@@ -501,9 +483,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.45,
 											"y": 93.4
@@ -555,9 +535,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.5,
 											"y": 93.35
@@ -609,9 +587,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.45,
 											"y": 93.35
@@ -663,9 +639,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.45,
 											"y": 93.4
@@ -717,9 +691,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.45,
 											"y": 93.35
@@ -771,9 +743,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.55,
 											"y": 93.4
@@ -825,9 +795,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.5,
 											"y": 93.35
@@ -879,9 +847,7 @@
 									"SYMBOL_Instance": {
 										"SYMBOL_name": "manon",
 										"Instance_Name": "",
-										"symbolType": "graphic",
-										"firstFrame": 0,
-										"loop": "loop",
+										"symbolType": "movieclip",
 										"transformationPoint": {
 											"x": 73.85000000000001,
 											"y": 93.7

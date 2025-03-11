@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wd4vucik3mnm"
-path="res://.godot/imported/spritemap1.png-df583f74e68c4e4c241135480f098c41.ctex"
+uid="uid://b707604sk4si5"
+path="res://.godot/imported/spritemap1.png-3edda925f6380ab9c6e5f2274614623c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://stickman/spritemap1.png"
-dest_files=["res://.godot/imported/spritemap1.png-df583f74e68c4e4c241135480f098c41.ctex"]
+source_file="res://stickman optimized/spritemap1.png"
+dest_files=["res://.godot/imported/spritemap1.png-3edda925f6380ab9c6e5f2274614623c.ctex"]
 
 [params]
 
