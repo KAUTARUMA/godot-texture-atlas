@@ -1,87 +1,18 @@
-{
-	"ATLAS": {
-		"SPRITES": [
-			{
-				"SPRITE": {
-					"name": "0001",
-					"x": 5.0,
-					"y": 5.0,
-					"w": 224.0,
-					"h": 212.0,
-					"rotated": false
-				}
-			},
-			{
-				"SPRITE": {
-					"name": "0002",
-					"x": 273.0,
-					"y": 149.0,
-					"w": 41.0,
-					"h": 31.0,
-					"rotated": false
-				}
-			},
-			{
-				"SPRITE": {
-					"name": "0003",
-					"x": 234.0,
-					"y": 5.0,
-					"w": 139.0,
-					"h": 139.0,
-					"rotated": false
-				}
-			},
-			{
-				"SPRITE": {
-					"name": "0004",
-					"x": 234.0,
-					"y": 149.0,
-					"w": 34.0,
-					"h": 42.0,
-					"rotated": false
-				}
-			},
-			{
-				"SPRITE": {
-					"name": "0005",
-					"x": 378.0,
-					"y": 5.0,
-					"w": 86.0,
-					"h": 176.0,
-					"rotated": false
-				}
-			},
-			{
-				"SPRITE": {
-					"name": "0006",
-					"x": 469.0,
-					"y": 28.0,
-					"w": 15.0,
-					"h": 16.0,
-					"rotated": false
-				}
-			},
-			{
-				"SPRITE": {
-					"name": "0007",
-					"x": 469.0,
-					"y": 5.0,
-					"w": 16.0,
-					"h": 18.0,
-					"rotated": false
-				}
-			}
-		]
-	},
-	"meta": {
-		"app": "Adobe Animate",
-		"version": "24.0.7.61",
-		"image": "spritemap1.png",
-		"format": "RGBA8888",
-		"size": {
-			"w": 490.0,
-			"h": 222.0
-		},
-		"resolution": "1"
-	}
+﻿{"ATLAS": {"SPRITES":[ 
+{"SPRITE" : {"name": "0001","x":5,"y":5,"w":224,"h":212,"rotated": false}},
+{"SPRITE" : {"name": "0002","x":273,"y":149,"w":41,"h":31,"rotated": false}},
+{"SPRITE" : {"name": "0003","x":234,"y":5,"w":139,"h":139,"rotated": false}},
+{"SPRITE" : {"name": "0004","x":234,"y":149,"w":34,"h":42,"rotated": false}},
+{"SPRITE" : {"name": "0005","x":378,"y":5,"w":86,"h":176,"rotated": false}},
+{"SPRITE" : {"name": "0006","x":469,"y":28,"w":15,"h":16,"rotated": false}},
+{"SPRITE" : {"name": "0007","x":469,"y":5,"w":16,"h":18,"rotated": false}}
+]},
+"meta": {
+"app": "Adobe Animate",
+"version": "24.0.7.61",
+"image": "spritemap1.png",
+"format": "RGBA8888",
+"size": {"w":490,"h":222},
+"resolution": "1"
+}
 }

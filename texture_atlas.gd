@@ -1,3 +1,4 @@
+@tool
 class_name TextureAtlas extends Node2D
 
 const NAMES_BASE = {
@@ -32,6 +33,8 @@ const NAMES_BASE = {
 		
 		if symbols.is_empty() == false:
 			timeline_length = get_timeline_length(get_layers())
+		
+		queue_redraw()
 
 @export var cur_frame:int = 0:
 	set(value):
@@ -47,8 +50,7 @@ const NAMES_BASE = {
 			spritemap_tex = load(dir.path_join("spritemap1.png"))
 			spritemap_json = load(dir.path_join("spritemap1.json"))
 			
-			if animation_json.data.has("AN"):
-				is_optimized = true
+			is_optimized = animation_json.data.has("AN")
 			
 			_load_atlas()
 
@@ -87,18 +89,6 @@ func _load_atlas() -> void:
 	symbols["_top"].reverse()
 	
 	timeline_length = get_timeline_length(get_layers())
-
-var count = 0.0
-func _process(delta: float) -> void:
-	#temp
-	count += delta
-	
-	if count >= 1./24.:
-		count = 0
-		cur_frame += 1
-		
-		if cur_frame > timeline_length:
-			cur_frame = 0
 
 func get_layers() -> Array:
 	if symbol == "" || !symbols.has(symbol):
