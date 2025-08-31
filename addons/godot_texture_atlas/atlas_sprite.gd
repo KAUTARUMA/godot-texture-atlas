@@ -28,7 +28,7 @@ const NAMES_BASE = {
 }
 
 # empty is defaulted to timeline
-@export var symbol:String = "":
+@export var symbol: String = "":
 	set(value):
 		symbol = value
 		
@@ -37,28 +37,24 @@ const NAMES_BASE = {
 		
 		queue_redraw()
 
-@export var cur_frame:int = 0:
+@export var cur_frame: int = 0:
 	set(value):
 		cur_frame = value
 		queue_redraw()
 
-@export var animation_json:JSON:
-	set(value):
-		animation_json = value
-		
-		if animation_json != null:
-			var dir = animation_json.resource_path.get_base_dir()
-			spritemap_tex = load(dir.path_join("spritemap1.png"))
-			spritemap_json = load(dir.path_join("spritemap1.json"))
-			
-			is_optimized = animation_json.data.has("AN")
-			
-			_load_atlas()
+@export var animation_json: JSON
+@export_tool_button("Reload Atlas") var reload_atlas = _load_atlas
+
+@export_category("Animation Player")
+@export var fps: int = 24
+@export var animations: Array[AtlasAnimInfo] = []
+@export_tool_button("Create Animation Player") var create_animplayer = _create_animation_player
+
+# duplicate json resource that we can edit
+var _animation_json: Dictionary
 
 var NAMES:Dictionary
-
 var timeline_length:int = 0
-
 var is_optimized:bool = false
 
 var spritemap_tex:Texture2D
@@ -67,7 +63,20 @@ var spritemap_json:JSON
 var limbs:Dictionary[String, Rect2i] = {}
 var symbols:Dictionary[String, Array] = {}
 
+func _ready() -> void:
+	_load_atlas()
+
 func _load_atlas() -> void:
+	if animation_json == null: return
+	
+	var dir = animation_json.resource_path.get_base_dir()
+	spritemap_tex = load(dir.path_join("spritemap1.png"))
+	spritemap_json = load(dir.path_join("spritemap1.json"))
+	
+	_animation_json = animation_json.data.duplicate(true)
+	
+	is_optimized = _animation_json.has("AN")
+	
 	NAMES = NAMES_BASE.duplicate()
 	limbs.clear()
 	symbols.clear()
@@ -80,16 +89,18 @@ func _load_atlas() -> void:
 		var sprite = _sprite["SPRITE"] # i dont know why these are in their own dict
 		limbs[sprite["name"]] = Rect2i(int(sprite["x"]), int(sprite["y"]), int(sprite["w"]), int(sprite["h"]))
 	
-	if animation_json.data.has(NAMES["SYMBOL_DICTIONARY"]):
-		for symbol_data in animation_json.data[NAMES["SYMBOL_DICTIONARY"]][NAMES["Symbols"]]:
+	if _animation_json.has(NAMES["SYMBOL_DICTIONARY"]):
+		for symbol_data in _animation_json[NAMES["SYMBOL_DICTIONARY"]][NAMES["Symbols"]]:
 			symbols[symbol_data[NAMES["SYMBOL_name"]]] = symbol_data[NAMES["TIMELINE"]][NAMES["LAYERS"]]
 			symbols[symbol_data[NAMES["SYMBOL_name"]]].reverse()
 	
 	# lets just hope no one names their symbol this lol
-	symbols["_top"] = animation_json.data[NAMES["ANIMATION"]][NAMES["TIMELINE"]][NAMES["LAYERS"]]
+	symbols["_top"] = _animation_json[NAMES["ANIMATION"]][NAMES["TIMELINE"]][NAMES["LAYERS"]]
 	symbols["_top"].reverse()
 	
 	timeline_length = get_timeline_length(get_layers())
+	
+	queue_redraw()
 
 func get_layers() -> Array:
 	if symbol == "" || !symbols.has(symbol):
@@ -137,7 +148,7 @@ func _draw_timeline(layers:Array, starting_frame:int, transformation:Transform2D
 					if element[NAMES["symbolType"]] == NAMES["movieclip"]:
 						new_starting_frame = cur_frame
 					else:
-						new_starting_frame = element[NAMES["firstFrame"]]
+						new_starting_frame = element[NAMES["firstFrame"]] + 1
 					
 					_draw_timeline(symbols[element[NAMES["SYMBOL_name"]]], new_starting_frame, transform_2d)
 				_:
@@ -167,3 +178,43 @@ func get_index_at_frame(target_frame:int, frames:Array) -> Dictionary:
 			return frame
 	
 	return {}
+
+func _create_animation_player() -> void:
+	var anim_player:AnimationPlayer = $AnimationPlayer if has_node("AnimationPlayer") else null
+	if anim_player == null:
+		push_error("Must have AnimationPlayer as a child!")
+		return
+
+	for anim_info in animations:
+		if !symbols.has(anim_info.symbol_name): continue
+		
+		var layers = symbols[anim_info.symbol_name]
+		var total_frames = get_timeline_length(layers)
+		if total_frames <= 0:
+			continue
+
+		var anim = Animation.new()
+		anim.length = float(total_frames) / fps
+		anim.loop_mode = anim_info.loop_mode
+		
+		var track_symbol = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track_symbol, ".:symbol")
+		anim.value_track_set_update_mode(track_symbol, Animation.UPDATE_DISCRETE)
+		anim.track_insert_key(track_symbol, 0.0, anim_info.symbol_name)
+		
+		var track_frame = anim.add_track(Animation.TYPE_VALUE)
+		anim.track_set_path(track_frame, ".:cur_frame")
+		
+		anim.track_insert_key(track_frame, 0, 0)
+		anim.track_insert_key(track_frame, anim.length, total_frames)
+		
+		var anim_name = anim_info.symbol_name.replace("/", "_").replace(" ", "_")
+		
+		var lib:AnimationLibrary
+		if not anim_player.has_animation_library("AtlasSymbols"):
+			lib = AnimationLibrary.new()
+			anim_player.add_animation_library("AtlasSymbols", lib)
+		else:
+			lib = anim_player.get_animation_library("AtlasSymbols")
+		
+		lib.add_animation(anim_name, anim)
