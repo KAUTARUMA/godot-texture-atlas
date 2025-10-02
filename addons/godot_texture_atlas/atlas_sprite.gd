@@ -60,7 +60,7 @@ var is_optimized:bool = false
 var spritemap_tex:Texture2D
 var spritemap_json:JSON
 
-var limbs:Dictionary[String, Rect2i] = {}
+var limbs:Dictionary[String, Dictionary] = {}
 var symbols:Dictionary[String, Array] = {}
 
 func _ready() -> void:
@@ -87,7 +87,12 @@ func _load_atlas() -> void:
 	
 	for _sprite in spritemap_json.data["ATLAS"]["SPRITES"]:
 		var sprite = _sprite["SPRITE"] # i dont know why these are in their own dict
-		limbs[sprite["name"]] = Rect2i(int(sprite["x"]), int(sprite["y"]), int(sprite["w"]), int(sprite["h"]))
+		limbs[sprite["name"]] = {
+			"rect": Rect2(int(sprite["x"]), int(sprite["y"]), int(sprite["w"]), int(sprite["h"])),
+			"rotated": sprite.has("rotated") and sprite["rotated"],
+			"source_size": Vector2(int(sprite.get("sourceSize", {}).get("w", sprite["w"])), int(sprite.get("sourceSize", {}).get("h", sprite["h"]))),
+			"spriteSourceSize": Vector2(int(sprite.get("spriteSourceSize", {}).get("x", 0)), int(sprite.get("spriteSourceSize", {}).get("y", 0)))
+		}
 	
 	if _animation_json.has(NAMES["SYMBOL_DICTIONARY"]):
 		for symbol_data in _animation_json[NAMES["SYMBOL_DICTIONARY"]][NAMES["Symbols"]]:
@@ -128,28 +133,31 @@ func _draw() -> void:
 func _draw_timeline(layers:Array, starting_frame:int, transformation:Transform2D = Transform2D()) -> void:
 	for layer in layers:
 		var frame = get_index_at_frame(starting_frame, layer[NAMES["Frames"]])
-		
 		if frame.is_empty(): continue
-		
 		for _element:Dictionary in frame[NAMES["elements"]]:
 			var type = _element.keys()[0]
 			var element = _element[type]
-			
 			var transform_2d = transformation * m3d_to_transform2d(element[NAMES["Matrix3D"]])
-			
 			match type:
 				"ATLAS_SPRITE_instance", "ASI":
 					var limb = limbs[element[NAMES["name"]]]
-					
-					draw_set_transform_matrix(transform_2d)
-					draw_texture_rect_region(spritemap_tex, Rect2i(0, 0, limb.size.x, limb.size.y), limbs[element[NAMES["name"]]])
+					var src = limb["rect"]
+					var offset = limb["spriteSourceSize"]
+					var draw_size = src.size
+					var local_transform = Transform2D()
+					if limb["rotated"]:
+						var rotated_offset = Vector2(offset.y, draw_size.x - offset.x)
+						local_transform = Transform2D(-PI/2, rotated_offset)
+					else:
+						local_transform.origin = -offset
+					draw_set_transform_matrix(transform_2d * local_transform)
+					draw_texture_rect_region(spritemap_tex, Rect2(Vector2.ZERO, draw_size), src)
 				"SYMBOL_Instance", "SI":
 					var new_starting_frame = 0
 					if element[NAMES["symbolType"]] == NAMES["movieclip"]:
 						new_starting_frame = cur_frame
 					else:
 						new_starting_frame = element[NAMES["firstFrame"]] + 1
-					
 					_draw_timeline(symbols[element[NAMES["SYMBOL_name"]]], new_starting_frame, transform_2d)
 				_:
 					push_warning("Unsupported type ", type, "!")
