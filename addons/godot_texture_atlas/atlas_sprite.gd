@@ -56,7 +56,11 @@ const NAMES_BASE = {
 	set(value):
 		animation_player_node = value
 		notify_property_list_changed()
-@export var ap_fps: int = 24
+@export var ap_fps: int = 24 ## Fps for current animation
+## List of animations for adding into [member animation_player_node]. [br]
+## [b]How to use?[/b][br]
+## Add new [AtlasAnimInfo] and paste into [member AtlasAnimInfo.symbol_name] from current [member symbol] (just [code]Copy property value[/code] from [member symbol] and paste into [member AtlasAnimInfo.symbol_name])[br]
+## After, press to [code]Create Animation[/code] button and done! Animations adds to your [member animation_player_node].
 @export var ap_animations: Array[AtlasAnimInfo] = []
 @export_tool_button("Create Animation") var ap_create_anim_button = _create_animation
 
