@@ -1,7 +1,7 @@
 @icon("res://addons/godot_texture_atlas/icon_atlas_sprite.svg")
 @tool
 class_name AtlasSprite extends Node2D
-## Sprite, what uses Adobe Animate's sprite atlases [b](!!!not sprite sheets!!!)[/b] to render.
+## A sprite that uses Adobe Animate's sprite atlases to render.
 
 const NAMES_BASE = {
 	"ANIMATION": "AN",
@@ -29,7 +29,7 @@ const NAMES_BASE = {
 }
 
 # empty is defaulted to timeline
-@export var symbol: String = "": ## Symbol for render.
+@export var symbol: String = "": ## The current symbol
 	set(value):
 		symbol = value
 		
@@ -38,29 +38,34 @@ const NAMES_BASE = {
 		
 		queue_redraw()
 
-@export var cur_frame: int = 0: ## Current frame of symbol.
+@export var cur_frame: int = 0: ## The current frame of the [member symbol]'s timeline.
 	set(value):
 		cur_frame = value
 		queue_redraw()
 
-@export var animation_json: JSON: ## [JSON]-file for your sprite atlas.
+@export var animation_json: JSON: ## The animation [JSON] file of your sprite atlas
 	set(value):
 		animation_json = value
 		notify_property_list_changed()
 		_load_atlas()
+
 @export_tool_button("Reload Atlas") var reload_atlas = _load_atlas
 
 @export_group("Animation Player")
-## Connect [AnimationPlayer] to this [AtlasSprite] for more easy way to animate this sprite.
+
+## The [AnimationPlayer] that will get the animations placed inside of. [br] See [member ap_animations] for more info.
 @export var animation_player_node: AnimationPlayer:
 	set(value):
 		animation_player_node = value
 		notify_property_list_changed()
-@export var ap_fps: int = 24 ## Fps for current animation
-## List of animations for adding into [member animation_player_node]. [br]
+
+@export var ap_fps: int = 24 ## The FPS the current animation will play at.
+
+## List of animations that will be added into the [member animation_player_node]. [br] [br]
 ## [b]How to use?[/b][br]
-## Add new [AtlasAnimInfo] and paste into [member AtlasAnimInfo.symbol_name] from current [member symbol] (just [code]Copy property value[/code] from [member symbol] and paste into [member AtlasAnimInfo.symbol_name])[br]
-## After, press to [code]Create Animation[/code] button and done! Animations adds to your [member animation_player_node].
+## For each symbol you want to use, create an [AtlasAnimInfo] and enter the symbol's name into [member AtlasAnimInfo.symbol_name]. [br] [br]
+## [i](This must be the full path to the symbol in the AE library, including any folders and such.)[/i] [br] [br]
+## Once you've selected all the symbols you want to use, press the [code]Create Animation[/code] button and the animations will be added to your [member animation_player_node].
 @export var ap_animations: Array[AtlasAnimInfo] = []
 @export_tool_button("Create Animation") var ap_create_anim_button = _create_animation
 
@@ -178,11 +183,13 @@ func _draw_timeline(layers:Array, starting_frame:int, transformation:Transform2D
 					var offset = limb["spriteSourceSize"]
 					var draw_size = src.size
 					var local_transform = Transform2D()
+					
 					if limb["rotated"]:
 						var rotated_offset = Vector2(offset.y, draw_size.x - offset.x)
 						local_transform = Transform2D(-PI/2, rotated_offset)
 					else:
 						local_transform.origin = -offset
+					
 					draw_set_transform_matrix(transform_2d * local_transform)
 					draw_texture_rect_region(spritemap_tex, Rect2(Vector2.ZERO, draw_size), src)
 				"SYMBOL_Instance", "SI":
@@ -223,7 +230,7 @@ func get_index_at_frame(target_frame:int, frames:Array) -> Dictionary:
 func _create_animation() -> void:
 	animation_player_node = $AnimationPlayer if has_node("AnimationPlayer") else null
 	if animation_player_node == null:
-		push_error("Must be set `animation_player_node!`")
+		push_error("The `animation_player_node` must be set!")
 		return
 
 	for anim_info in ap_animations:
