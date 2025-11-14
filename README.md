@@ -6,5 +6,4 @@ Adds support for using Adobe Animate Texture Atlases in Godot.
 Currently Unsupported Features:
 - Masking
 - Any sort of Movie Clip effects
-- The "Rotate" option within AE export settings
 - And probably some other things I'm forgetting...
