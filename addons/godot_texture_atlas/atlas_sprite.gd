@@ -1,6 +1,7 @@
 @icon("res://addons/godot_texture_atlas/icon_atlas_sprite.svg")
 @tool
 class_name AtlasSprite extends Node2D
+## Sprite, what uses Adobe Animate's sprite atlases [b](!!!not sprite sheets!!!)[/b] to render.
 
 const NAMES_BASE = {
 	"ANIMATION": "AN",
@@ -28,7 +29,7 @@ const NAMES_BASE = {
 }
 
 # empty is defaulted to timeline
-@export var symbol: String = "":
+@export var symbol: String = "": ## Symbol for render.
 	set(value):
 		symbol = value
 		
@@ -37,18 +38,32 @@ const NAMES_BASE = {
 		
 		queue_redraw()
 
-@export var cur_frame: int = 0:
+@export var cur_frame: int = 0: ## Current frame of symbol.
 	set(value):
 		cur_frame = value
 		queue_redraw()
 
-@export var animation_json: JSON
+@export var animation_json: JSON: ## [JSON]-file for your sprite atlas.
+	set(value):
+		animation_json = value
+		notify_property_list_changed()
+		_load_atlas()
 @export_tool_button("Reload Atlas") var reload_atlas = _load_atlas
 
-@export_category("Animation Player")
-@export var fps: int = 24
-@export var animations: Array[AtlasAnimInfo] = []
-@export_tool_button("Create Animation Player") var create_animplayer = _create_animation_player
+@export_group("Animation Player")
+## Connect [AnimationPlayer] to this [AtlasSprite] for more easy way to animate this sprite.
+@export var animation_player_node: AnimationPlayer:
+	set(value):
+		animation_player_node = value
+		notify_property_list_changed()
+@export var ap_fps: int = 24 ## Fps for current animation
+## List of animations for adding into [member animation_player_node]. [br]
+## [b]How to use?[/b][br]
+## Add new [AtlasAnimInfo] and paste into [member AtlasAnimInfo.symbol_name] from current [member symbol] (just [code]Copy property value[/code] from [member symbol] and paste into [member AtlasAnimInfo.symbol_name])[br]
+## After, press to [code]Create Animation[/code] button and done! Animations adds to your [member animation_player_node].
+@export var ap_animations: Array[AtlasAnimInfo] = []
+@export_tool_button("Create Animation") var ap_create_anim_button = _create_animation
+
 
 # duplicate json resource that we can edit
 var _animation_json: Dictionary
@@ -63,11 +78,33 @@ var spritemap_json:JSON
 var limbs:Dictionary[String, Dictionary] = {}
 var symbols:Dictionary[String, Array] = {}
 
-func _ready() -> void:
-	_load_atlas()
+#func _ready() -> void:
+	#_load_atlas()
+
+func _validate_property(property: Dictionary) -> void:
+	if property.name == "symbol":
+		property.hint = PROPERTY_HINT_ENUM
+		property.hint_string = ",".join(symbols.keys())
+	elif property.name.begins_with("ap_"):
+		if !animation_player_node:
+			property.usage = PROPERTY_USAGE_NONE
+
+func _draw() -> void:
+	if !symbols.is_empty():
+		_draw_timeline(get_layers(), cur_frame)
 
 func _load_atlas() -> void:
-	if animation_json == null: return
+	if !animation_json:
+		_animation_json.clear()
+		timeline_length = 0
+		
+		spritemap_tex = null
+		spritemap_json = null
+		
+		limbs.clear()
+		symbols.clear()
+		queue_redraw()
+		return
 	
 	var dir = animation_json.resource_path.get_base_dir()
 	spritemap_tex = load(dir.path_join("spritemap1.png"))
@@ -126,10 +163,6 @@ func get_timeline_length(layers:Array) -> int:
 	
 	return longest_length
 
-func _draw() -> void:
-	if !symbols.is_empty():
-		_draw_timeline(get_layers(), cur_frame)
-
 func _draw_timeline(layers:Array, starting_frame:int, transformation:Transform2D = Transform2D()) -> void:
 	for layer in layers:
 		var frame = get_index_at_frame(starting_frame, layer[NAMES["Frames"]])
@@ -187,13 +220,13 @@ func get_index_at_frame(target_frame:int, frames:Array) -> Dictionary:
 	
 	return {}
 
-func _create_animation_player() -> void:
-	var anim_player:AnimationPlayer = $AnimationPlayer if has_node("AnimationPlayer") else null
-	if anim_player == null:
-		push_error("Must have AnimationPlayer as a child!")
+func _create_animation() -> void:
+	animation_player_node = $AnimationPlayer if has_node("AnimationPlayer") else null
+	if animation_player_node == null:
+		push_error("Must be set `animation_player_node!`")
 		return
 
-	for anim_info in animations:
+	for anim_info in ap_animations:
 		if !symbols.has(anim_info.symbol_name): continue
 		
 		var layers = symbols[anim_info.symbol_name]
@@ -202,7 +235,7 @@ func _create_animation_player() -> void:
 			continue
 
 		var anim = Animation.new()
-		anim.length = float(total_frames) / fps
+		anim.length = float(total_frames) / ap_fps
 		anim.loop_mode = anim_info.loop_mode
 		
 		var track_symbol = anim.add_track(Animation.TYPE_VALUE)
@@ -219,10 +252,10 @@ func _create_animation_player() -> void:
 		var anim_name = anim_info.symbol_name.replace("/", "_").replace(" ", "_")
 		
 		var lib:AnimationLibrary
-		if not anim_player.has_animation_library("AtlasSymbols"):
+		if not animation_player_node.has_animation_library("AtlasSymbols"):
 			lib = AnimationLibrary.new()
-			anim_player.add_animation_library("AtlasSymbols", lib)
+			animation_player_node.add_animation_library("AtlasSymbols", lib)
 		else:
-			lib = anim_player.get_animation_library("AtlasSymbols")
+			lib = animation_player_node.get_animation_library("AtlasSymbols")
 		
 		lib.add_animation(anim_name, anim)
